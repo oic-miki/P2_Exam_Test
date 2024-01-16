@@ -1,0 +1,91 @@
+﻿<Window x:Class="P2_Exam_Test.View.ListWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:P2_Exam_Test"
+        xmlns:viewModel="clr-namespace:P2_Exam_Test.ViewModel"
+        mc:Ignorable="d"
+        Title="一覧画面" Height="450" Width="800">
+    <Window.DataContext>
+        <viewModel:ListWindowViewModel x:Name="ViewModel"/>
+    </Window.DataContext>
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
+            <Button DockPanel.Dock="Right" Margin="5,5,5,5" Width="80" Height="30" Content="追加" Command="{Binding NewButtonCommand}"/>
+        </DockPanel>
+        <DataGrid ItemsSource="{Binding ToDoItems}" AutoGenerateColumns="False" CanUserAddRows="False">
+            <DataGrid.Resources>
+                <DataTemplate x:Key="DoneTemplate">
+                    <Grid>
+                        <CheckBox IsChecked="{Binding Done, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                </DataTemplate>
+                <DataTemplate x:Key="TaskNameTemplate">
+                    <Grid>
+                        <TextBlock Text="{Binding TaskName}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0">
+                            <TextBlock.Resources>
+                                <viewModel:IsLimitOverConverter x:Key="IsLimitOver"/>
+                            </TextBlock.Resources>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Limit, Converter={StaticResource IsLimitOver}}" Value="True">
+                                            <Setter Property="TextBlock.Foreground" Value="Red"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Done}" Value="True">
+                                            <Setter Property="TextBlock.Foreground" Value="LightGray"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </DataTemplate>
+                <DataTemplate x:Key="DateTemplate">
+                    <TextBlock Text="{Binding Limit, StringFormat=yyyy/MM/dd}" HorizontalAlignment="Center"/>
+                </DataTemplate>
+                <DataTemplate x:Key="EditTemplate">
+                    <Button Content="編集" Command="{Binding ElementName=ViewModel, Path=EditButtonCommand}" CommandParameter="{Binding Id}"/>
+                </DataTemplate>
+            </DataGrid.Resources>
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="Background" Value="White"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                    <Setter Property="BorderBrush" Value="{x:Null}"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="White"/>
+                            <Setter Property="Foreground" Value="Black"/>
+                            <Setter Property="BorderBrush" Value="{x:Null}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="White"/>
+                    <Setter Property="BorderBrush" Value="{x:Null}"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="White"/>
+                            <Setter Property="BorderBrush" Value="{x:Null}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="完了" CellTemplate="{StaticResource DoneTemplate}"/>
+                <DataGridTemplateColumn Width="*" Header="内容" CellTemplate="{StaticResource TaskNameTemplate}"/>
+                <DataGridTemplateColumn MinWidth="100" Header="期限" CellTemplate="{StaticResource DateTemplate}"/>
+                <DataGridTemplateColumn Width="50" Header="編集" CellTemplate="{StaticResource EditTemplate}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>
